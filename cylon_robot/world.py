@@ -1,3 +1,5 @@
+import time
+
 from selenium import webdriver
 from selenium.common.exceptions import *
 
@@ -7,9 +9,10 @@ from .repository import *
 
 class world:
     driver = None
+    timeout = 10
 
     @classmethod
-    def open_browser(cls, browser="chrome"):
+    def open_browser(cls, browser):
         if browser == "chrome":
             cls.driver = webdriver.Chrome()
         elif browser == "firefox":
@@ -18,8 +21,8 @@ class world:
             log.info("the '%s' browser is not supported" % browser)
             return
 
-        cls.driver.implicitly_wait(8)
-        cls.driver.set_page_load_timeout(15)
+        cls.driver.implicitly_wait(cls.timeout)
+        cls.driver.set_page_load_timeout(cls.timeout)
 
 
     @classmethod
@@ -32,18 +35,7 @@ class world:
 
 
     @classmethod
-    def get_page(cls, ref):
-        pass
-
-
-    @classmethod
     def find_element(cls, ref):
-        # if ref.startswith('...'):
-        #     ref = cls.ref_path + ref[ref.rfind('.'):]
-        # elif ref.startswith('.'):
-        #     ref = cls.ref_root + ref
-        #
-        # selector = cls.get_ref_value(ref)
         selector = repository.extract_ref(ref)
 
         try:
@@ -53,10 +45,6 @@ class world:
                 element = cls.driver.find_element_by_css_selector(selector)
         except NoSuchElementException:
             log.error("element not found %s" % ref)
-
-        # if "'" not in ref:
-        #     cls.ref_root = ref[:ref.find('.')]
-        #     cls.ref_path = ref[:ref.rfind('.')]
 
         return element
 
@@ -74,3 +62,14 @@ class world:
             log.error("elements not found %s" % ref)
 
         return elements
+
+
+    @classmethod
+    def wait_element_present(cls, element):
+        for n in range(cls.timeout):
+            if element.is_displayed():
+                time.sleep(1)
+                return element
+            time.sleep(1)
+
+        log.error("element not present")

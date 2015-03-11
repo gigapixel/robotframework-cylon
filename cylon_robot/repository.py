@@ -8,7 +8,7 @@ from .log import *
 class repository:
     refs = None
     ref_root = ''
-    ref_path = ''
+    ref_leaf = ''
 
     @classmethod
     def load_references(cls, files="./repositories/*.yml"):
@@ -20,13 +20,13 @@ class repository:
     @classmethod
     def extract_ref(cls, ref):
         if ref.startswith('...'):
-            ref = cls.ref_path + ref[ref.rfind('.'):]
+            ref = cls.ref_leaf + ref[ref.rfind('.'):]
         elif ref.startswith('.'):
             ref = cls.ref_root + ref
 
         if "'" not in ref:
             cls.ref_root = ref[:ref.find('.')]
-            cls.ref_path = ref[:ref.rfind('.')]
+            cls.ref_leaf = ref[:ref.rfind('.')]
 
         return cls.get_ref_value(ref)
 
@@ -52,12 +52,12 @@ class repository:
 
     @classmethod
     def replace_refs(cls, text):
-        pattern = '\${([^}]*)}'
+        pattern = '#{([^}]*)}'
         refs = re.findall(pattern, text)
 
         for ref in refs:
             value = cls.get_ref_value(ref)
-            variable = "${%s}" % ref
+            variable = "#{%s}" % ref
             text = text.replace(variable, value)
 
         return text
