@@ -8,7 +8,7 @@ from .world import *
 from .repository import *
 
 
-class WebLibrary(object):
+class keywords(object):
 
     def cylon_setup(self):
         repository.load_references()

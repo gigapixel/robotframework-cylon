@@ -1,5 +1,5 @@
 *** Settings ***
-Library  cylon_robot.WebLibrary
+Library  cylon_robot.keywords
 
 
 *** Keywords ***
